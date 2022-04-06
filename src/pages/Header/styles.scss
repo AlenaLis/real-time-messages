@@ -1,0 +1,44 @@
+.header {
+  width: 100vw;
+  background: #1976d2;
+  height: 80px;
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+
+  &-left-side {
+    margin-left: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+
+    .link {
+      text-decoration: none;
+      color: #fff;
+    }
+  }
+
+  &-right-side {
+    margin-right: 15px;
+
+    button {
+      margin-right: 10px;
+      color: #fff;
+      border: 1px solid #fff;
+    }
+
+     button:hover{
+       background: cornflowerblue;
+      }
+
+    .reg-button {
+
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+}
