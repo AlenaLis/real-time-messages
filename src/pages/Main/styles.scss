@@ -1,0 +1,53 @@
+.main {
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 30px;
+
+  .card {
+    top: 200px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    position: absolute;
+    height: fit-content;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    .cardHeader {
+      font-weight: bold;
+      color: #1976d2;
+      padding-top: 20px;
+      text-transform: uppercase;
+    }
+
+    .cardBody {
+      margin-top: 32px;
+
+      .inputGroup {
+        margin-bottom: 16px;
+      }
+    }
+
+    .chatRooms {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      width: 100%;
+
+      .room {
+        display: flex;
+        margin: 5px 15px;
+        height: fit-content;
+
+        a {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
