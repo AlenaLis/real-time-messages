@@ -23,22 +23,43 @@
   &-right-side {
     margin-right: 15px;
 
-    button {
-      margin-right: 10px;
-      color: #fff;
-      border: 1px solid #fff;
-    }
+    .wrapper-header {
 
-     button:hover{
-       background: cornflowerblue;
+      button {
+        margin-right: 10px;
+        color: #fff;
+        border: 1px solid #fff;
       }
 
-    .reg-button {
+      button:hover{
+        background: cornflowerblue;
+      }
 
+      a {
+        text-decoration: none;
+      }
+
+      @media (max-width: 548px) {
+        display: flex;
+        flex-direction: column;
+        align-content: end;
+        align-items: end;
+        width: 100%;
+        max-width: 150px;
+        min-width: 150px;
+
+        button {
+          width: 100%;
+          height: fit-content;
+          font-size: 13px;
+          border: none;
+          text-align: end;
+        }
+      }
     }
 
-    a {
-      text-decoration: none;
+    .reg-button {
+      color: #fff;
     }
   }
 }

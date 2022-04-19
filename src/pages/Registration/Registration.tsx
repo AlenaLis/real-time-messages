@@ -1,33 +1,34 @@
-import React, { useState } from 'react'
-import { Button, TextField } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import React, {useState} from 'react';
+import {Button, TextField} from '@mui/material';
+import {useNavigate} from 'react-router-dom';
 
-import { registration } from '../../services'
+import {registration} from '../../services';
 
-import './styles.scss'
+import './styles.scss';
 
 const Registration = () => {
-  const [email, setEmail] = useState('')
-  const [login, setLogin] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   const Submit = async () => {
     await registration({
       email,
       password,
       name: login,
-    }).then((res) => {
+    }).then(res => {
       if (res?.statusText === 'OK') {
-        navigate('/auth')
+        navigate('/auth');
       }
-    })
-  }
+    });
+  };
 
-  const onSubmit = (event: { preventDefault: () => void }) => {
-    event.preventDefault()
-    Submit()
-  }
+  const onSubmit = (event: {preventDefault: () => void}) => {
+    event.preventDefault();
+    Submit();
+  };
 
   return (
     <div className="registration">
@@ -40,7 +41,7 @@ const Registration = () => {
           className="email"
           type="email"
           placeholder="example@.com"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           value={email}
           required={true}
         />
@@ -51,7 +52,7 @@ const Registration = () => {
           variant="outlined"
           className="login"
           value={login}
-          onChange={(e) => setLogin(e.target.value)}
+          onChange={e => setLogin(e.target.value)}
           required={true}
         />
         <TextField
@@ -63,14 +64,14 @@ const Registration = () => {
           value={password}
           autoComplete="password"
           required={true}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
         />
         <Button variant="outlined" className="login-button" type="submit">
           Registration
         </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Registration
+export default Registration;

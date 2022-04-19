@@ -1,33 +1,33 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, TextField } from '@mui/material'
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Button, TextField} from '@mui/material';
 
-import { login } from '../../services'
+import {login} from '../../services';
 
-import './styles.scss'
+import './styles.scss';
 
 const Auth = (setupSocket: any) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const setPersons = async () => {
     await login({
       email,
       password,
-    }).then((res) => {
+    }).then(res => {
       if (res?.statusText === 'OK') {
-        localStorage.setItem('CC_Token', res.data.token)
-        setupSocket.setupSocket()
-        navigate('/')
+        localStorage.setItem('CC_Token', res.data.token);
+        setupSocket.setupSocket();
+        navigate('/');
       }
-    })
-  }
+    });
+  };
 
-  const checkPerson = (event: { preventDefault: () => void }) => {
-    event.preventDefault()
-    setPersons()
-  }
+  const checkPerson = (event: {preventDefault: () => void}) => {
+    event.preventDefault();
+    setPersons();
+  };
 
   return (
     <div className="auth">
@@ -39,7 +39,7 @@ const Auth = (setupSocket: any) => {
           className="email"
           type="email"
           placeholder="example@.com"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           required={true}
         />
         <TextField
@@ -48,7 +48,7 @@ const Auth = (setupSocket: any) => {
           variant="outlined"
           className="password"
           type="password"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required={true}
         />
         <Button variant="outlined" className="login-button" type="submit">
@@ -56,7 +56,7 @@ const Auth = (setupSocket: any) => {
         </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default Auth
+export default Auth;

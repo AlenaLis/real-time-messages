@@ -1,88 +1,153 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import {Button, ListItem, TextField} from '@mui/material';
+import {useMatch, useNavigate} from 'react-router-dom';
+import {getChatroom} from '../../services';
+import makeToast from '../../helpers/Toaster';
 
-const ChatRoom = ({ match, socket }: any) => {
-  const [messages, setMessages] = useState([])
-  const [userId, setUserId] = useState('')
-  const messageRef: any = useRef()
+import './styles.scss';
 
-  const token = localStorage?.getItem('CC_Token')
+const ChatRoom = (socket: any) => {
+  const [messages, setMessages] = useState([]);
+  const [roomData, setRoomData]: any = useState('');
+  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [userId, setUserId] = useState('');
+  const [text, setText] = useState('');
 
-  const chatroomId = match?.params?.id
+  const navigate = useNavigate();
+
+  const match = useMatch('/chatroom/:id');
+  const token = localStorage?.getItem('CC_Token');
+
+  const chatroomId: any = match?.params?.id;
+
+  const getRoomData = async () => {
+    await getChatroom(chatroomId).then(res => {
+      setRoomData(res);
+    });
+  };
 
   const sendMessage = () => {
     if (socket) {
-      socket.emit('chatroomMessage', {
+      socket?.socket?.emit('chatroomMessage', {
         chatroomId,
-        message: messageRef.current.value,
-      })
-
-      messageRef.current.value = ''
+        message: text,
+      });
+      setText('');
     }
-  }
+  };
 
   useEffect(() => {
     if (token && token?.length > 0) {
-      const payload = JSON.parse(atob(token?.split('.')[1]))
-      setUserId(payload?.id)
+      const payload = JSON.parse(atob(token?.split('.')[1]));
+      setUserId(payload?.id);
     }
-  }, [token])
+  }, [token]);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('newMessage', (message: string) => {
-        const newMessages: any = [...messages, message]
-        setMessages(newMessages)
-      })
+    if (socket && token) {
+      socket?.socket?.on('newMessage', (message: string) => {
+        const newMessages: any = [...messages, message];
+        setMessages(newMessages);
+      });
     }
-  }, [socket, messages, messageRef])
+  }, [socket, messages, text]);
 
   useEffect(() => {
-    if (socket) {
-      socket.emit('joinRoom', {
-        chatroomId,
-      })
-    }
+    getRoomData();
 
-    return () => {
-      if (socket) {
-        socket.emit('leaveRoom', {
-          chatroomId,
+    if (socket && token) {
+      axios
+        .get(`http://localhost:8000/messages/${chatroomId}`, {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('CC_Token'),
+          },
         })
-      }
+        .then((response: any) => {
+          setMessages(response?.data);
+        })
+        .catch(err => {
+          makeToast('error', err.response.data.message);
+        });
     }
-  }, [])
+  }, [socket, userId]);
 
+  useEffect(() => {
+    if (socket) {
+      socket?.socket?.on(`roomIsDeleted`, (event: string) => {
+        if (event === 'Room was deleted by owner') {
+          makeToast('info', event);
+          navigate('/');
+        }
+      });
+
+      socket?.socket?.on('event', (user: any) => {
+        const joinUsers: any = [...users, user];
+        setUsers(joinUsers);
+      });
+
+      socket?.socket?.on('allUsers', (user: any) => {
+        setAllUsers(user?.user);
+      });
+
+      socket?.socket?.on('owner', (user: any) => {
+        makeToast('info', user);
+      });
+    }
+  }, [socket?.socket?.on, socket]);
+
+  const set = new Set(allUsers);
+  const finalUsers = Array.from(set);
   return (
-    <div className="main">
-      <div>
-        <div className="chatroomPage">
-          <div className="chatroomSection">
-            <div className="cardHeader">Chatroom Name</div>
-            <div className="chatroomContent">
-              {messages?.map((message: any, i: number) => (
-                <div key={i} className="message">
-                  <span className={userId === message?.userId ? 'ownMessage' : 'otherMessage'}>
-                    {message?.name}:
-                  </span>{' '}
-                  {message?.message}
-                </div>
-              ))}
+    <div className="chatroomPage">
+      <div className="users">
+        <p>Users in the room:</p>
+        <div className="userContainer">
+          {finalUsers?.map((el: string, key: number) => (
+            <ListItem className="newUser" key={key}>
+              <span>·</span>
+              {el}
+            </ListItem>
+          ))}
+        </div>
+      </div>
+      <div className="chatroomSection">
+        {roomData?.data?.map((el: {name: string}, key: number) => (
+          <div className="cardHeader" key={key}>
+            Chatroom Name: <span>{el?.name}</span>
+          </div>
+        ))}
+        <div className="chatroomContent">
+          {messages?.map((message: any, i: number) => (
+            <div key={i} className="message">
+              <span className={userId === message?.userId ? 'ownMessage' : 'otherMessage'}>
+                {message?.name}:
+              </span>{' '}
+              <p>{message?.message}</p>
             </div>
-            <div className="chatroomActions">
-              <div>
-                <input type="text" name="message" placeholder="Say something!" ref={messageRef} />
-              </div>
-              <div>
-                <button className="join" onClick={sendMessage}>
-                  Send
-                </button>
-              </div>
-            </div>
+          ))}
+        </div>
+
+        <div className="chatroomActions">
+          <div>
+            <TextField
+              type="text"
+              value={text}
+              name="message"
+              placeholder="Say something!"
+              onChange={e => setText(e.target.value)}
+            />
+          </div>
+          <div>
+            <Button variant="outlined" className="join" onClick={sendMessage}>
+              Send
+            </Button>
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChatRoom
+export default ChatRoom;

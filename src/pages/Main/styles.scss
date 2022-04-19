@@ -3,9 +3,15 @@
   display: flex;
   justify-content: center;
   padding-bottom: 30px;
+  width: fit-content;
+
+  input {
+    width: 100%;
+    max-width: 150px;
+  }
 
   .card {
-    top: 200px;
+    top: 100px;
     width: 100%;
     max-width: 400px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -18,10 +24,10 @@
     align-items: center;
 
     .cardHeader {
+      padding-top: 10px;
+      text-transform: uppercase;
       font-weight: bold;
       color: #1976d2;
-      padding-top: 20px;
-      text-transform: uppercase;
     }
 
     .cardBody {
@@ -40,7 +46,6 @@
       width: 100%;
 
       .room {
-        display: flex;
         margin: 5px 15px;
         height: fit-content;
 
