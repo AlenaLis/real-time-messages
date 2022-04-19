@@ -10,12 +10,13 @@ You can create your own account, authentificate with it in our project and creat
 ### `git clone https://github.com/AlenaLis/real-time-messages.git`
 
 2) After that you should open the folder in the terminal with the client part and install dependencies:
-### `cd client`
+### `cd real-time-messenger/`
 ### `yarn`
 ### `yarn start`
 
 3) After that you should open the folder in the terminal with the api part and install dependencies:
-### `cd api`
+### `cd real-time-messenger/`
+### `cd api/`
 ### `yarn`
 ### `yarn start`
 
