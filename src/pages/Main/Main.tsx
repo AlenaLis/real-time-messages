@@ -1,73 +1,100 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import { Link } from 'react-router-dom'
-import { Button, TextField } from '@mui/material'
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
+import {Button, TextField} from '@mui/material';
 
-import { postChatRoom } from '../../services'
+import {deleteChatroom, postChatRoom} from '../../services';
 
-import './styles.scss'
+import './styles.scss';
 
 const Main = (socket: any) => {
-  const [auth, setAuth] = useState(false)
-  const [update, setUpdate] = useState(false)
-  const [name, setName] = useState('')
-  const [chatRooms, setChatRooms] = useState([])
+  const [auth, setAuth] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [name, setName] = useState('');
+  const [userId, setUserId] = useState('');
+  const [chatRooms, setChatRooms] = useState([]);
 
-  const token = localStorage?.getItem('CC_Token')
-
-  const getChatRooms = async () => {
-    await axios
-      .get('http://localhost:8000/chatroom', {
-        headers: {
-          Authorization: 'Bearer ' + localStorage.getItem('CC_Token'),
-        },
-      })
-      .then((response) => {
-        setChatRooms(response.data)
-        setUpdate(false)
-      })
-      .catch(() => {
-        setUpdate(false)
-      })
-  }
+  const token = localStorage?.getItem('CC_Token');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (token && token?.length > 0) {
-      setAuth(true)
-    } else {
-      setAuth(false)
+      const payload = JSON.parse(atob(token?.split('.')[1]));
+      setUserId(payload?.id);
     }
-  }, [token])
+  }, [token, userId]);
+
+  const getChatRooms = async () => {
+    if (socket && token) {
+      await axios
+        .get('http://localhost:8000/chatroom', {
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('CC_Token'),
+          },
+        })
+        .then(response => {
+          setChatRooms(response.data);
+          setUpdate(false);
+        })
+        .catch(() => {
+          setUpdate(false);
+        });
+    }
+  };
+
+  const Delete = async (chatroomId: string) => {
+    await deleteChatroom(chatroomId).then(() => {
+      getChatRooms();
+
+      if (socket) {
+        socket?.socket?.emit('roomIsDeleted', chatroomId);
+      }
+    });
+  };
+
+  const postRoom = async () => {
+    if (socket && token) {
+      await postChatRoom({
+        name,
+        userId,
+      }).then(res => {
+        if (res?.statusText === 'OK') {
+          setUpdate(true);
+          setName('');
+        }
+      });
+    }
+  };
+
+  const JoinRoom = (chatroomId: string, id: string) => {
+    if (socket) {
+      socket?.socket?.emit('joinRoom', chatroomId, id);
+
+      navigate(`/chatroom/` + `${chatroomId}`);
+    }
+  };
 
   useEffect(() => {
-    getChatRooms()
-  }, [])
+    if (token && token?.length > 0) {
+      setAuth(true);
+    } else {
+      setAuth(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    getChatRooms();
+  }, []);
 
   useEffect(() => {
     if (update) {
-      getChatRooms()
+      getChatRooms();
     }
-  }, [update, chatRooms])
-
-  const postRoom = async () => {
-    await postChatRoom({
-      name,
-    }).then((res) => {
-      if (res?.statusText === 'OK') {
-        socket.setupSocket()
-        setUpdate(true)
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (chatRooms?.length > 0) {
-    }
-  }, [chatRooms])
+  }, [update, chatRooms]);
 
   return (
     <div className="main">
-      {auth ? (
+      {auth && socket ? (
         <div className="card">
           <div className="cardHeader">Rooms for chat</div>
           <div className="cardBody">
@@ -80,7 +107,7 @@ const Main = (socket: any) => {
                 type="text"
                 value={name}
                 required={true}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
               />
             </div>
           </div>
@@ -88,11 +115,14 @@ const Main = (socket: any) => {
             Create Chatroom
           </Button>
           <div className="chatRooms">
-            {chatRooms?.map((chatroom: { _id: string; name: string }) => (
+            {chatRooms?.map((chatroom: {_id: string; name: string; userId: string}) => (
               <div className="room" key={chatroom?._id}>
-                <Link to={'/chatroom/' + chatroom?._id}>
-                  <Button>'{chatroom?.name}' room for chat</Button>
-                </Link>
+                <Button onClick={() => JoinRoom(chatroom?._id, userId)}>
+                  '{chatroom?.name}' room for chat
+                </Button>
+                {chatroom?.userId === userId && (
+                  <Button onClick={() => Delete(chatroom?._id)}>Delete</Button>
+                )}
               </div>
             ))}
           </div>
@@ -101,7 +131,7 @@ const Main = (socket: any) => {
         <p>Please Log In to use Time Messenger</p>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Main
+export default Main;

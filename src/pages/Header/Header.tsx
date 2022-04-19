@@ -1,27 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react';
 
-import { Button } from '@mui/material'
-import { Link } from 'react-router-dom'
+import {Button} from '@mui/material';
+import {Link, useNavigate} from 'react-router-dom';
 
-import './styles.scss'
+import './styles.scss';
 
-const Header = () => {
-  const [auth, setAuth] = useState(false)
+const Header = (socket: any) => {
+  const [auth, setAuth] = useState(false);
 
-  const token = localStorage.getItem('CC_Token')
+  const navigate = useNavigate();
+  const token = localStorage?.getItem('CC_Token');
 
   useEffect(() => {
-    if (token && token?.length > 0) {
-      setAuth(true)
+    if (token && token?.length > 0 && socket) {
+      setAuth(true);
     } else {
-      setAuth(false)
+      setAuth(false);
+      navigate('/auth');
     }
-  }, [token])
+  }, [token]);
 
   const LogOut = () => {
-    localStorage.removeItem('token')
-    window.location.reload()
-  }
+    localStorage?.removeItem('CC_Token');
+    window.location.reload();
+  };
 
   return (
     <header className="header">
@@ -33,7 +35,7 @@ const Header = () => {
 
       <div className="header-right-side">
         {!auth ? (
-          <div>
+          <div className="wrapper-header">
             <Link to="/auth">
               <Button variant="outlined" className="sign-button">
                 Sign In
@@ -52,7 +54,7 @@ const Header = () => {
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

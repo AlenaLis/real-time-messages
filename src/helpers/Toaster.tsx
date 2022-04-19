@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 const Toast = Swal.mixin({
   toast: true,
@@ -6,13 +6,13 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-})
+});
 
 const makeToast = (type: any, msg: string) => {
   Toast.fire({
     icon: type,
     title: msg,
-  })
-}
+  });
+};
 
-export default makeToast
+export default makeToast;
